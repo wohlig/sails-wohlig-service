@@ -12,5 +12,13 @@
     "service"
   ],
   "author": "Chintan Shah",
-  "license": "ISC"
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wohlig/sails-wohlig-service.git"
+  },
+  "bugs": {
+    "url": "https://github.com/wohlig/sails-wohlig-service/issues"
+  },
+  "homepage": "https://github.com/wohlig/sails-wohlig-service#readme"
 }
