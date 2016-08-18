@@ -1,3 +1,4 @@
+var mongoose = require('mongoose');
 module.exports = function(schema,deepGetOne,deepSearch) {
     var data = {
         saveData: function(data, callback) {
