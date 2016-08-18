@@ -1,0 +1,16 @@
+{
+  "name": "sails-wohlig-service",
+  "version": "0.0.1",
+  "description": "Sails Wohlig Service",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "sails",
+    "wohlig",
+    "service"
+  ],
+  "author": "Chintan Shah",
+  "license": "ISC"
+}
