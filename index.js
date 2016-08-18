@@ -1,4 +1,4 @@
-module.exports = function(schema) {
+module.exports = function(schema,deepGetOne,deepSearch) {
     var data = {
         saveData: function(data, callback) {
             var Model = this;
@@ -100,7 +100,7 @@ module.exports = function(schema) {
             var Const = this(data);
             Model.findOne({
                 _id: data._id
-            }).deepPopulate(data.deep).exec(callback);
+            }).deepPopulate(deepGetOne).exec(callback);
         },
         search: function(data, callback) {
             var Model = this;
@@ -130,7 +130,7 @@ module.exports = function(schema) {
             var Search = Model.find(data.filter)
 
             .order(options)
-                .deepPopulate(data.deep)
+                .deepPopulate(deepSearch)
                 .keyword(options)
                 .page(options, callback);
 
