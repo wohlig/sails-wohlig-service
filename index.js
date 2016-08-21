@@ -1,5 +1,5 @@
 var mongoose = require('mongoose');
-module.exports = function(schema,deepGetOne,deepSearch) {
+module.exports = function(schema, deepGetOne, deepSearch) {
     var data = {
         saveData: function(data, callback) {
             var Model = this;
@@ -7,7 +7,7 @@ module.exports = function(schema,deepGetOne,deepSearch) {
             var foreignKeys = Config.getForeignKeys(schema);
             if (data._id) {
                 Model.findOne({
-                    _id: data._id
+                    _id: mongoose.Types.ObjectId(data._id)
                 }, function(err, data2) {
                     if (err) {
                         callback(err, data2);
@@ -61,7 +61,7 @@ module.exports = function(schema,deepGetOne,deepSearch) {
             var Const = this(data);
             var foreignKeys = Config.getForeignKeys(schema);
             Config.checkRestrictedDelete(Model, schema, {
-                _id: data._id
+                _id: mongoose.Types.ObjectId(data._id)
             }, function(err, value) {
                 if (err) {
                     callback(err, null);
@@ -99,8 +99,9 @@ module.exports = function(schema,deepGetOne,deepSearch) {
         getOne: function(data, callback) {
             var Model = this;
             var Const = this(data);
+
             Model.findOne({
-                _id: data._id
+                _id: mongoose.Types.ObjectId(data._id)
             }).deepPopulate(deepGetOne).exec(callback);
         },
         search: function(data, callback) {
@@ -129,8 +130,7 @@ module.exports = function(schema,deepGetOne,deepSearch) {
             };
 
             var Search = Model.find(data.filter)
-
-            .order(options)
+                .order(options)
                 .deepPopulate(deepSearch)
                 .keyword(options)
                 .page(options, callback);
