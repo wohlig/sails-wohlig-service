@@ -1,20 +1,20 @@
 var mongoose = require('mongoose');
-module.exports = function(schema,deepGetOne,deepSearch) {
+module.exports = function (schema, deepGetOne, deepSearch, defaultSort, defaultSortOrder) {
     var data = {
-        saveData: function(data, callback) {
+        saveData: function (data, callback) {
             var Model = this;
             var Const = this(data);
             var foreignKeys = Config.getForeignKeys(schema);
             if (data._id) {
                 Model.findOne({
                     _id: data._id
-                }, function(err, data2) {
+                }, function (err, data2) {
                     if (err) {
                         callback(err, data2);
                     } else if (data2) {
-                        async.each(foreignKeys, function(n, callback) {
+                        async.each(foreignKeys, function (n, callback) {
                             if (data[n.name] != data2[n.name]) {
-                                Config.manageArrayObject(mongoose.models[n.ref], data2[n.name], data2._id, n.key, "delete", function(err, md) {
+                                Config.manageArrayObject(mongoose.models[n.ref], data2[n.name], data2._id, n.key, "delete", function (err, md) {
                                     if (err) {
                                         callback(err, md);
                                     } else {
@@ -24,7 +24,7 @@ module.exports = function(schema,deepGetOne,deepSearch) {
                             } else {
                                 callback(null, "no found for ");
                             }
-                        }, function(err) {
+                        }, function (err) {
                             data2.update(data, {
                                 w: 1
                             }, callback);
@@ -37,16 +37,16 @@ module.exports = function(schema,deepGetOne,deepSearch) {
                 });
             } else {
 
-                Const.save(function(err, data2) {
+                Const.save(function (err, data2) {
                     if (err) {
                         callback(err, data2);
                     } else {
 
-                        async.each(foreignKeys, function(n, callback) {
-                            Config.manageArrayObject(mongoose.models[n.ref], data2[n.name], data2._id, n.key, "create", function(err, md) {
+                        async.each(foreignKeys, function (n, callback) {
+                            Config.manageArrayObject(mongoose.models[n.ref], data2[n.name], data2._id, n.key, "create", function (err, md) {
                                 callback(err, data2);
                             });
-                        }, function(err) {
+                        }, function (err) {
                             callback(err, data2);
                         });
 
@@ -56,31 +56,31 @@ module.exports = function(schema,deepGetOne,deepSearch) {
             }
 
         },
-        deleteData: function(data, callback) {
+        deleteData: function (data, callback) {
             var Model = this;
             var Const = this(data);
             var foreignKeys = Config.getForeignKeys(schema);
             Config.checkRestrictedDelete(Model, schema, {
                 _id: data._id
-            }, function(err, value) {
+            }, function (err, value) {
                 if (err) {
                     callback(err, null);
                 } else if (value) {
                     Model.findOne({
                         _id: data._id
-                    }).exec(function(err, data2) {
+                    }).exec(function (err, data2) {
                         if (err) {
                             callback("Error Occured", null);
                         } else if (data2) {
-                            async.each(foreignKeys, function(n, callback) {
-                                Config.manageArrayObject(mongoose.models[n.ref], data2[n.name], data2._id, n.key, "delete", function(err, md) {
+                            async.each(foreignKeys, function (n, callback) {
+                                Config.manageArrayObject(mongoose.models[n.ref], data2[n.name], data2._id, n.key, "delete", function (err, md) {
                                     callback(err, data2);
                                 });
-                            }, function(err) {
+                            }, function (err) {
                                 if (err) {
                                     callback(err, md);
                                 } else {
-                                    data2.remove({}, function(err, data3) {
+                                    data2.remove({}, function (err, data3) {
                                         if (err) {
                                             callback(err, data3);
                                         } else {
@@ -96,14 +96,14 @@ module.exports = function(schema,deepGetOne,deepSearch) {
                 }
             });
         },
-        getOne: function(data, callback) {
+        getOne: function (data, callback) {
             var Model = this;
             var Const = this(data);
             Model.findOne({
                 _id: data._id
             }).deepPopulate(deepGetOne).exec(callback);
         },
-        search: function(data, callback) {
+        search: function (data, callback) {
             var Model = this;
             var Const = this(data);
             var maxRow = Config.maxRow;
@@ -113,6 +113,10 @@ module.exports = function(schema,deepGetOne,deepSearch) {
                 page = data.page;
             }
             var field = data.field;
+
+
+
+
             var options = {
                 field: data.field,
                 filters: {
@@ -127,6 +131,18 @@ module.exports = function(schema,deepGetOne,deepSearch) {
                 start: (page - 1) * maxRow,
                 count: maxRow
             };
+
+            if (defaultSort) {
+                if (defaultSortOrder && defaultSortOrder === "desc") {
+                    options.sort = {
+                        desc: defaultSort
+                    };
+                } else {
+                    options.sort = {
+                        asc: defaultSort
+                    };
+                }
+            }
 
             var Search = Model.find(data.filter)
 
