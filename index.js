@@ -1,6 +1,27 @@
 var mongoose = require('mongoose');
 module.exports = function (schema, deepGetOne, deepSearch, defaultSort, defaultSortOrder) {
     var data = {
+        getIdByName: function (data, callback) {
+            var Model = this;
+            var Const = this(data);
+            Model.findOne({
+                name: data.name
+            }, function (err, data2) {
+                if (err) {
+                    callback(err);
+                } else if (_.isEmpty(data2)) {
+                    Const.save(function (err, data3) {
+                        if (err) {
+                            callback(err);
+                        } else {
+                            callback(null, data3._id);
+                        }
+                    });
+                } else {
+                    callback(null, data2._id);
+                }
+            });
+        },
         saveData: function (data, callback) {
             var Model = this;
             var Const = this(data);
