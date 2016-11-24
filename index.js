@@ -1,6 +1,92 @@
 var mongoose = require('mongoose');
 module.exports = function (schema, deepGetOne, deepSearch, defaultSort, defaultSortOrder) {
     var data = {
+        import: function (data, callback) {
+            var Model = this;
+            var retVal = [];
+            async.eachSeries(data, function (n, callback) {
+                Model(n).save(n, function (err, data) {
+                    if (err) {
+                        err.val = data;
+                        retVal.push(err);
+                    } else {
+                        retVal.push(data._id);
+                    }
+                    callback();
+                });
+            }, function (err) {
+                if (err) {
+                    callback(err, data);
+                } else {
+                    callback(err, {
+                        total: retVal.length,
+                        value: retVal
+                    });
+                }
+            });
+        },
+        generateExcel: function (name, res) {
+            var Model = this;
+            Model.find().exec(function (err, data) {
+
+                var data3 = _.map(data, function (data2) {
+                    return modifyForExcel(data2);
+                });
+
+                function schamaObjectValConversion(newObj, schExcel, obj, key, value) {
+                    var name = key;
+                    if (schExcel.name) {
+                        name = schExcel.name;
+                    }
+                    if (schExcel.modify) {
+                        newObj[name] = schExcel.modify(value, obj);
+                    } else {
+                        newObj[name] = value;
+                    }
+                }
+
+                function modifyForExcel(obj) {
+                    var newObj = {};
+
+                    _.each(schema.obj, function (sch, key) {
+
+                        var value = obj[key];
+                        switch (typeof sch.excel) {
+
+                            case "boolean":
+                                {
+                                    newObj[key] = value;
+                                }
+                                break;
+                            case "string":
+                                {
+                                    newObj[sch.excel] = value;
+                                }
+                                break;
+                            case "object":
+                                {
+                                    if (_.isArray(sch.excel)) {
+                                        _.each(sch.excel, function (singleExcel) {
+                                            schamaObjectValConversion(newObj, singleExcel, obj, key, value);
+                                        });
+
+                                    } else {
+                                        schamaObjectValConversion(newObj, sch.excel, obj, key, value);
+
+                                    }
+                                }
+                                break;
+                        }
+
+                    });
+                    return newObj;
+                }
+
+
+                Config.generateExcel(name, data3, res);
+
+            });
+        },
         getIdByName: function (data, callback) {
             var Model = this;
             var Const = this(data);
