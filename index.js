@@ -28,7 +28,6 @@ module.exports = function (schema, deepGetOne, deepSearch, defaultSort, defaultS
         generateExcel: function (name, res) {
             var Model = this;
             Model.find().exec(function (err, data) {
-
                 var data3 = _.map(data, function (data2) {
                     return modifyForExcel(data2);
                 });
