@@ -273,7 +273,9 @@ module.exports = function(
       var Const = this(data);
       Model.findOne({
         _id: data._id
-      }).exec(callback);
+      })
+        .deepPopulate(deepGetOne)
+        .exec(callback);
     },
     search: function(data, callback) {
       var Model = this;
@@ -314,7 +316,7 @@ module.exports = function(
       }
 
       var Search = Model.find(data.filter)
-
+        .deepPopulate(deepSearch)
         .order(options)
         .keyword(options)
         .page(options, callback);
