@@ -1,6 +1,6 @@
 {
   "name": "sails-wohlig-service",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "Sails Wohlig Service",
   "main": "index.js",
   "scripts": {
